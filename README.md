@@ -1,164 +1,315 @@
-1. Toán tử tích chập trong lọc ảnh hoạt động như thế nào?
-Về mặt lý thuyết, toán tử tích chập hoạt động bằng cách trượt một cửa sổ nhỏ (gọi là mặt nạ hoặc kernel) quét qua toàn bộ các điểm ảnh của ảnh gốc. Tại mỗi vị trí, giá trị điểm ảnh mới ở trung tâm cửa sổ được tính bằng tổng của các tích giữa giá trị điểm ảnh gốc và hệ số tương ứng trong mặt nạ. Quá trình này giúp biến đổi tính chất của ảnh như làm mờ hoặc làm sắc nét.
+LinkedList+ArrayList
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-2. Sự khác biệt giữa bộ lọc trung vị (Median) và bộ lọc trung bình (Mean) là gì?
-Bộ lọc Trung bình: Là bộ lọc tuyến tính. Nó tính trung bình cộng của các điểm ảnh trong cửa sổ. Nhược điểm là làm nhòe ảnh và mờ các biên (cạnh) của vật thể.
-Bộ lọc Trung vị: Là bộ lọc phi tuyến. Nó sắp xếp các giá trị trong cửa sổ và chọn giá trị nằm giữa. Ưu điểm nổi bật là loại bỏ nhiễu muối tiêu cực cực tốt và bảo toàn được độ sắc nét của các biên (cạnh) tốt hơn bộ lọc trung bình.
-3. Giá trị cường độ sáng của ảnh phụ thuộc vào những yếu tố nào?
-Về mặt vật lý, cường độ sáng tại một điểm ảnh được quyết định bởi hai yếu tố:
-Nguồn sáng chiếu tới: Lượng năng lượng ánh sáng chiếu vào vật thể.
-Hệ số phản xạ: Đặc tính bề mặt của vật thể quyết định bao nhiêu phần trăm ánh sáng được phản xạ lại mắt người hoặc cảm biến (ví dụ gương phản xạ nhiều, nhung đen phản xạ ít).
-4. Giải thuật Otsu chạy bao nhiêu vòng lặp với ảnh mã hoá 8 bits? Giải thích.
-Giải thuật sẽ chạy 256 vòng lặp (hoặc 256 lần kiểm tra).
-Giải thích: Ảnh 8-bit có các mức xám từ 0 đến 255. Để tìm ngưỡng tối ưu, thuật toán phải thử lần lượt từng giá trị từ 0 đến 255 làm ngưỡng tạm thời, sau đó tính toán phương sai tại mỗi ngưỡng để tìm ra kết quả tốt nhất.
-5. Cho ảnh F(x,y), giải thích cách xác định ảnh đầu ra g(x,y) sử dụng bộ lọc trung vị, không sử dụng các biên.
-Để tìm giá trị mới cho một điểm ảnh:
-Đặt cửa sổ lọc (ví dụ 3x3) có tâm nằm tại điểm ảnh đó.
-Lấy tất cả các giá trị điểm ảnh nằm trong cửa sổ.
-Sắp xếp các giá trị này theo thứ tự tăng dần hoặc giảm dần.
-Lấy giá trị nằm chính giữa dãy số (trung vị) gán cho điểm ảnh đầu ra.
-Lưu ý: "Không xử lý biên" nghĩa là ta bỏ qua các điểm ảnh ở viền ngoài cùng của ảnh, nơi mà cửa sổ lọc không thể đặt trọn vẹn vào trong ảnh được.
-6. Nêu khái niệm và tác dụng của phép biến đổi âm bản (Negative transformation) trong xử lý ảnh?
-Khái niệm: Là kỹ thuật đảo ngược mức xám của ảnh (vùng sáng thành tối, vùng tối thành sáng), tương tự như phim âm bản trong nhiếp ảnh truyền thống.
-Tác dụng: Giúp làm nổi bật các chi tiết màu trắng hoặc xám nhạt nằm trên một nền tối rộng lớn, thường được dùng để phân tích ảnh y tế (như phim X-quang).
-7. Phương pháp Otsu là một kỹ thuật phân ngưỡng tự động dựa trên Histogram (Lược đồ xám). Hãy nêu ngắn gọn nguyên lý hoạt động của thuật toán Otsu để giải thích tại sao phương pháp này lại tìm được ngưỡng 𝑇 tối ưu để tách ảnh thành hai lớp (Tiền cảnh/Hậu cảnh)?
-Phương pháp Otsu là kỹ thuật tìm ngưỡng tự động dựa trên lược đồ xám (Histogram). Nguyên lý cốt lõi là chia ảnh thành hai lớp (nền và vật thể) sao cho sự tách biệt giữa hai lớp này là lớn nhất. Về mặt toán học, nó tìm ngưỡng T sao cho phương sai giữa các lớp (between-class variance) đạt giá trị cực đại. Khi đó, xác suất phân tách sai giữa vật thể và nền là thấp nhất.
+public class ListPerformanceTest {
 
-8. Nắn chỉnh biến dạng hình học là gì ? Tại sao phải nắn chỉnh biến dạng hình học ?
-Khái niệm: Là quá trình khôi phục lại không gian hình học của ảnh về đúng tỷ lệ thực tế thông qua các phép biến đổi toạ độ và nội suy.
-Lý do: Ảnh thu được thường bị méo do góc chụp nghiêng, độ cong của ống kính camera hoặc tốc độ di chuyển của vệ tinh. Việc nắn chỉnh là bắt buộc để có thể đo đạc kích thước chính xác hoặc chồng ghép các bản đồ ảnh lên nhau.
-9. Nếu một ảnh cần chuyển thành ảnh nhị phân chỉ có 2 thành phần 0 và 1 thì cần làm những gì? Giải thích.
-Cần thực hiện kỹ thuật Phân ngưỡng (Thresholding).
-Ta chọn một giá trị ngưỡng T cụ thể. Sau đó duyệt qua từng điểm ảnh: nếu giá trị điểm ảnh lớn hơn hoặc bằng T thì gán thành 1 (trắng), nếu nhỏ hơn T thì gán thành 0 (đen). Kết quả là ảnh chỉ còn hai màu đen và trắng.
-10. Bạn hiểu thế nào là lấy mẫu? Giải thích nó trong xử lý ảnh?
-Lấy mẫu là quá trình chuyển đổi không gian ảnh liên tục thành không gian rời rạc. Một bức ảnh thực tế là liên tục, để đưa vào máy tính, ta phải chia nó thành một lưới các ô vuông nhỏ (các điểm ảnh). Mật độ lấy mẫu càng cao (lưới càng dày) thì độ phân giải không gian của ảnh càng tốt, ảnh càng sắc nét.
+    static final int N = 100000; // Số lượng phần tử: 100.000
 
-11. Tăng cường ảnh là gì? Liệt kê một số phương pháp miền không gian để tăng cường ảnh.
-Khái niệm: Là quá trình xử lý làm cho ảnh có chất lượng tốt hơn (theo cảm nhận mắt người) hoặc phù hợp hơn cho các bước xử lý máy tính tiếp theo so với ảnh gốc.
-Các phương pháp miền không gian: Biến đổi hàm mũ (Gamma correction), Cân bằng lược đồ xám (Histogram Equalization), Lọc làm trơn (Smoothing), Lọc làm sắc nét (Sharpening).
-12. Giải thích quá trình làm mịn ảnh bằng lọc trung vị?
-Quá trình này làm mịn ảnh bằng cách loại bỏ các giá trị ngoại lai (outliers). Khi một điểm ảnh bị nhiễu (quá sáng hoặc quá tối so với vùng lân cận), việc sắp xếp và lấy giá trị trung vị sẽ thay thế điểm nhiễu đó bằng một giá trị thực tế hơn từ các điểm xung quanh. Do không dùng phép tính trung bình cộng, nên các cạnh sắc của vật thể không bị san phẳng (làm mờ) mà vẫn giữ được độ sắc nét.
+    public static void main(String[] args) {
+        System.out.println("--- BẮT ĐẦU TEST VỚI " + N + " PHẦN TỬ ---\n");
 
-13. Xử lý ảnh là gì ? Hãy nêu hai mô hình biểu diễn ảnh cơ bản?
-Khái niệm: Là lĩnh vực sử dụng máy tính và các giải thuật toán học để thao tác trên ảnh số nhằm cải thiện chất lượng hoặc trích xuất thông tin hữu ích.
-Hai mô hình:
-Mô hình Raster (Ma trận điểm ảnh - phổ biến nhất).
-Mô hình Vector (Biểu diễn bằng công thức toán học).
-14. Giải thích sự khác nhau giữa phép lọc thông thấp (low-pass filter) và lọc thông cao (high-pass filter) trong xử lý ảnh. Nêu một ứng dụng thực tế của mỗi loại lọc.
-Lọc thông thấp (Low-pass): Chỉ cho các thành phần tần số thấp (vùng ảnh thay đổi chậm, đồng màu) đi qua và chặn tần số cao. Kết quả làm ảnh bị mờ đi, mịn hơn. Ứng dụng: Khử nhiễu.
-Lọc thông cao (High-pass): Chỉ cho các thành phần tần số cao (vùng thay đổi đột ngột như cạnh, biên) đi qua và chặn tần số thấp. Kết quả làm ảnh nổi bật các đường biên. Ứng dụng: Làm sắc nét ảnh, phát hiện biên.
-15. Đầu vào của hệ thống xử lý ảnh là gì?
-Đầu vào là một ảnh số (digital image) hoặc tín hiệu thị giác từ cảm biến đã được số hóa thành ma trận hai chiều các con số.
+        // --- Test ArrayList ---
+        List<Integer> arrayList = new ArrayList<>();
+        long start = System.nanoTime();
+        
+        // 1. Thêm phần tử vào ArrayList
+        for (int i = 0; i < N; i++) {
+            arrayList.add(i);
+        }
+        long endAdd = System.nanoTime();
+        
+        // 2. Xóa phần tử đầu tiên (index 0) khỏi ArrayList
+        while (!arrayList.isEmpty()) {
+            arrayList.remove(0);
+        }
+        long endRemove = System.nanoTime();
 
-16. Histogram là gì?
-Histogram (Lược đồ xám): Là biểu đồ thể hiện sự phân bố tần suất của các mức xám trong ảnh. Nó cho biết có bao nhiêu điểm ảnh ở mỗi mức độ sáng tối khác nhau. Nhìn vào histogram, ta có thể đánh giá được ảnh đang bị quá sáng, quá tối hay có độ tương phản tốt hay không.
-
-17. Nhiễu ảnh do đâu mà có?
-Nhiễu xuất hiện do các yếu tố khách quan trong quá trình tạo và truyền ảnh:
-Do cảm biến thu nhận (nhiễu nhiệt, nhiễu điện tử).
-Do môi trường (ánh sáng yếu, bức xạ).
-Do quá trình truyền tín hiệu (nhiễu đường truyền).
-18. Sự khác biệt của xử lý ảnh trong miền tần số và xử lý ảnh trong miền không gian.
-Miền không gian: Tính toán trực tiếp trên giá trị các điểm ảnh (pixel) của ảnh gốc.
-Miền tần số: Chuyển đổi ảnh sang không gian tần số (thường dùng biến đổi Fourier), xử lý trên phổ tần số đó, rồi biến đổi ngược lại về ảnh. Phương pháp này hiệu quả cho các bài toán lọc toàn cục hoặc loại bỏ nhiễu có tính chu kỳ.
-19. Nêu sơ đồ tổng quát của một hệ thống xử lý ảnh
-Quy trình chuẩn gồm các bước: Thu nhận ảnh $\rightarrow$ Tiền xử lý (Tăng cường/Khôi phục) $\rightarrow$ Phân đoạn ảnh $\rightarrow$ Biểu diễn & Mô tả $\rightarrow$ Nhận dạng & Nội suy.
-
-20. Vấn đề nào trong xử lý ảnh là quan trọng nhất, tại sao.
-Phân đoạn ảnh (Segmentation) thường được coi là bước quan trọng và khó nhất.
-Lý do: Mục đích cuối cùng của xử lý ảnh thường là để máy tính "hiểu" đối tượng. Nếu khâu phân đoạn (tách đối tượng ra khỏi nền) bị sai, máy tính sẽ nhận diện nhầm đối tượng, dẫn đến tất cả các bước phân tích, đo đạc phía sau đều vô nghĩa.
+        printResult("ArrayList", (endAdd - start), (endRemove - endAdd));
 
 
-Code GGE 
-// ================== KHỞI TẠO MA TRẬN ẢNH I (8x8) ==================
-var I = ee.Array([
-  [35, 24, 78, 89, 53, 68, 87, 34],
-  [46, 23, 57, 56, 45, 32, 23, 68],
-  [143, 15, 123, 46, 56, 45, 67, 88],
-  [224, 156, 231, 65, 23, 65, 123, 90],
-  [12, 167, 241, 45, 23, 45, 78, 75],
-  [124, 25, 47, 88, 36, 75, 12, 25],
-  [12, 82, 21, 26, 48, 55, 64, 46],
-  [53, 56, 28, 32, 77, 89, 76, 36]
-]);
+        // --- Test LinkedList ---
+        List<Integer> linkedList = new LinkedList<>();
+        start = System.nanoTime();
 
-print('Ảnh gốc I', I);
+        // 1. Thêm phần tử vào LinkedList
+        for (int i = 0; i < N; i++) {
+            linkedList.add(i);
+        }
+        endAdd = System.nanoTime();
 
-// ======================================================
-// CÂU 1 – BIẾN ĐỔI GAMMA: I_gamma = c * I^r
-// ======================================================
-var c = 1.0;
-var r = 0.5;
-var I_gamma = I.pow(r).multiply(c);
-print('Ảnh sau biến đổi gamma (I_gamma)', I_gamma);
+        // 2. Xóa phần tử đầu tiên (index 0) khỏi LinkedList
+        while (!linkedList.isEmpty()) {
+            linkedList.remove(0);
+        }
+        endRemove = System.nanoTime();
 
-// ======================================================
-// CÂU 2 – CÂN BẰNG HISTOGRAM TỰ TÍNH
-// ======================================================
+        printResult("LinkedList", (endAdd - start), (endRemove - endAdd));
+    }
 
-var L = 256;
-var rows = 8;
-var cols = 8;
-var N = rows * cols;
+    // Hàm hỗ trợ in kết quả
+    private static void printResult(String type, long addDuration, long removeDuration) {
+        System.out.println("Cấu trúc: " + type);
+        // Chuyển đổi nanosecond sang millisecond để dễ đọc
+        System.out.printf("  - Thời gian thêm %d phần tử: %.2f ms%n", N, addDuration / 1_000_000.0);
+        System.out.printf("  - Thời gian xóa (từ đầu) %d phần tử: %.2f ms%n", N, removeDuration / 1_000_000.0);
+        System.out.println("------------------------------------------------");
+    }
+}
 
-// --- Bước 1: "Làm phẳng" và CHUYỂN SANG LIST ---
-// ee.Array không map được, phải chuyển sang ee.List
-var flatArray = I.reshape([N]); 
-var flatList = flatArray.toList(); // Chuyển Array 1D thành List số
+HashSet+TreeSet
+import java.util.*;
 
-// --- Bước 2: Tính histogram ---
-var grayLevels = ee.List.sequence(0, L - 1);
+public class SetPerformanceTest {
 
-var histList = grayLevels.map(function(g) {
-  g = ee.Number(g);
-  // flatArray.eq(g) trả về mảng 0 và 1. reduce(sum) để đếm số lượng số 1.
-  var count = flatArray.eq(g)
-              .reduce(ee.Reducer.sum(), [0])
-              .get([0]);
-  return count;
-});
+    static final int N = 100000; // Số lượng phần tử
+    static final int RANGE = 200000; // Khoảng giá trị (0 - 200,000)
 
-print('Histogram', histList);
+    public static void main(String[] args) {
+        // 1. Tạo tập dữ liệu ngẫu nhiên (dùng chung cho cả 2 để công bằng)
+        System.out.println("Đang tạo dữ liệu ngẫu nhiên...");
+        int[] data = new int[N];
+        Random rand = new Random();
+        for (int i = 0; i < N; i++) {
+            data[i] = rand.nextInt(RANGE);
+        }
+        System.out.println("Đã tạo xong 100.000 số nguyên.\n");
 
-// --- Bước 3: PDF ---
-var pdfList = histList.map(function(cnt) {
-  return ee.Number(cnt).divide(N);
-});
+        // 2. Test HashSet
+        System.out.println("--- TEST HASHSET ---");
+        Set<Integer> hashSet = new HashSet<>();
+        performTest(hashSet, data);
 
-// --- Bước 4: CDF (Cộng dồn) ---
-var cdfList = ee.List(pdfList).iterate(
-  function(val, acc) {
-    acc = ee.List(acc);
-    val = ee.Number(val);
-    var cumPrev = ee.Number(acc.get(-1));
-    var cumNew = cumPrev.add(val);
-    return acc.add(cumNew);
-  },
-  ee.List([0])
-);
-// Bỏ phần tử 0 khởi tạo
-cdfList = ee.List(cdfList).slice(1);
+        System.out.println();
 
-// --- Bước 5: Bảng ánh xạ s = round((L-1)*CDF) ---
-// index là mức xám cũ, value là mức xám mới
-var mappingList = cdfList.map(function(cdf) {
-  return ee.Number(cdf).multiply(L - 1).round().int(); 
-});
+        // 3. Test TreeSet
+        System.out.println("--- TEST TREESET ---");
+        Set<Integer> treeSet = new TreeSet<>();
+        performTest(treeSet, data);
+    }
 
-print('Bảng ánh xạ (Mapping List)', mappingList);
+    public static void performTest(Set<Integer> set, int[] data) {
+        long start, end;
 
-// --- Bước 6: Áp dụng ánh xạ cho ảnh I ---
+        // --- Thao tác THÊM (Add) ---
+        start = System.nanoTime();
+        for (int x : data) {
+            set.add(x);
+        }
+        end = System.nanoTime();
+        double addTime = (end - start) / 1_000_000.0;
+        System.out.printf("Thời gian thêm %d phần tử: %.2f ms%n", N, addTime);
 
-//  Dùng flatList (là ee.List) để map
-//  mỗi pixel cũ (v), lấy giá trị tại vị trí v trong mappingList
+        // --- Kiểm tra THỨ TỰ LƯU TRỮ ---
+        System.out.print("Dữ liệu lưu trữ (10 phần tử đầu): ");
+        int count = 0;
+        for (Integer i : set) {
+            System.out.print(i + " ");
+            count++;
+            if (count >= 10) break; // Chỉ in 10 số đại diện
+        }
+        System.out.println("...");
 
-var I_eq_flat_list = flatList.map(function(v) {
-  v = ee.Number(v).int(); // Đảm bảo index là số nguyên
-  return mappingList.get(v); // Lấy giá trị mới từ bảng ánh xạ
-});
+        // --- Thao tác TÌM KIẾM (Contains) ---
+        // Tìm lại chính các số trong data để đảm bảo xác suất tìm thấy cao
+        start = System.nanoTime();
+        for (int x : data) {
+            set.contains(x);
+        }
+        end = System.nanoTime();
+        double searchTime = (end - start) / 1_000_000.0;
+        System.out.printf("Thời gian kiểm tra tồn tại (contains): %.2f ms%n", searchTime);
 
-// --- Bước 7: Chuyển List trở lại Ma trận 8x8 ---
-var I_eq = ee.Array(I_eq_flat_list).reshape([rows, cols]);
+        // --- Thao tác XÓA (Remove) ---
+        start = System.nanoTime();
+        for (int x : data) {
+            set.remove(x);
+        }
+        end = System.nanoTime();
+        double removeTime = (end - start) / 1_000_000.0;
+        System.out.printf("Thời gian xóa phần tử: %.2f ms%n", removeTime);
+    }
+}
 
-print('Ảnh sau cân bằng histogram (I_eq)', I_eq);
+HashMap+TreeMap
+import java.util.*;
+
+public class MapPerformanceTest {
+
+    static final int N = 100000;       // Số lượng phần tử
+    static final int KEY_RANGE = 200000; // Khoảng giá trị của Key
+
+    public static void main(String[] args) {
+        // 1. Chuẩn bị dữ liệu đầu vào (Dùng chung cho cả 2 Map để công bằng)
+        System.out.println("Đang tạo dữ liệu ngẫu nhiên...");
+        int[] keys = new int[N];
+        int[] values = new int[N];
+        Random rand = new Random();
+        for (int i = 0; i < N; i++) {
+            keys[i] = rand.nextInt(KEY_RANGE); // Key ngẫu nhiên
+            values[i] = rand.nextInt(1000);    // Value ngẫu nhiên
+        }
+        System.out.println("Đã chuẩn bị xong dữ liệu.\n");
+
+        // 2. Test HashMap
+        System.out.println("====== TEST HASHMAP ======");
+        performTest(new HashMap<>(), keys, values);
+
+        System.out.println();
+
+        // 3. Test TreeMap
+        System.out.println("====== TEST TREEMAP ======");
+        performTest(new TreeMap<>(), keys, values);
+    }
+
+    public static void performTest(Map<Integer, Integer> map, int[] keys, int[] values) {
+        long start, end;
+
+        // --- 1. Thao tác THÊM (Put) ---
+        start = System.nanoTime();
+        for (int i = 0; i < N; i++) {
+            map.put(keys[i], values[i]);
+        }
+        end = System.nanoTime();
+        System.out.printf("  - Thời gian thêm (put): %.2f ms%n", (end - start) / 1_000_000.0);
+
+        // --- 2. Kiểm tra THỨ TỰ LƯU TRỮ ---
+        System.out.print("  - Thứ tự key (10 phần tử đầu): ");
+        int count = 0;
+        // Duyệt qua keySet để xem thứ tự
+        for (Integer key : map.keySet()) {
+            System.out.print(key + " ");
+            count++;
+            if (count >= 10) break;
+        }
+        System.out.println("...");
+
+        // --- 3. Thao tác LẤY GIÁ TRỊ (Get) ---
+        start = System.nanoTime();
+        for (int key : keys) {
+            map.get(key);
+        }
+        end = System.nanoTime();
+        System.out.printf("  - Thời gian lấy (get): %.2f ms%n", (end - start) / 1_000_000.0);
+
+        // --- 4. Thao tác KIỂM TRA TỒN TẠI (ContainsKey) ---
+        start = System.nanoTime();
+        for (int key : keys) {
+            map.containsKey(key);
+        }
+        end = System.nanoTime();
+        System.out.printf("  - Thời gian kiểm tra key (containsKey): %.2f ms%n", (end - start) / 1_000_000.0);
+
+        // --- 5. Thao tác XÓA (Remove) ---
+        start = System.nanoTime();
+        for (int key : keys) {
+            map.remove(key);
+        }
+        end = System.nanoTime();
+        System.out.printf("  - Thời gian xóa (remove): %.2f ms%n", (end - start) / 1_000_000.0);
+    }
+}
+
+Thread
+public class ThreadExercise {
+
+    public static void main(String[] args) {
+        System.out.println("--- Bắt đầu chương trình ---");
+
+        // --- 1. Tạo Thread 1: Tính tổng từ 1 đến 1000 ---
+        Thread thread1 = new Thread(() -> {
+            System.out.println("[Thread-1] Đang tính tổng...");
+            int sum = 0;
+            for (int i = 1; i <= 1000; i++) {
+                sum += i;
+            }
+            System.out.println("-> [Thread-1] Tổng các số từ 1 đến 1000 là: " + sum);
+        });
+
+        // --- 2. Tạo Thread 2: Tìm số nguyên tố lớn nhất < 1000 ---
+        Thread thread2 = new Thread(() -> {
+            System.out.println("[Thread-2] Đang tìm số nguyên tố...");
+            int maxPrime = -1;
+            
+            // Duyệt ngược từ 999 về 2 để tìm số nguyên tố đầu tiên
+            for (int i = 999; i >= 2; i--) {
+                if (isPrime(i)) {
+                    maxPrime = i;
+                    break; // Tìm thấy số lớn nhất thì dừng ngay
+                }
+            }
+            System.out.println("-> [Thread-2] Số nguyên tố lớn nhất nhỏ hơn 1000 là: " + maxPrime);
+        });
+
+        // --- 3. Khởi chạy 2 Thread ---
+        thread1.start();
+        thread2.start();
+        
+        System.out.println("--- Main thread đã gửi lệnh start() ---");
+    }
+
+    // Hàm hỗ trợ kiểm tra số nguyên tố
+    public static boolean isPrime(int n) {
+        if (n < 2) return false;
+        // Chỉ cần kiểm tra đến căn bậc 2 của n để tối ưu hiệu năng
+        for (int i = 2; i <= Math.sqrt(n); i++) {
+            if (n % i == 0) return false;
+        }
+        return true;
+    }
+}
+
+Luồng
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+public class FileIOExercise {
+
+    public static void main(String[] args) {
+        String fileName = "raw.txt";
+        String myName = "Nguyen Van A"; // Bạn thay tên mình vào đây
+
+        System.out.println("--- BẮT ĐẦU CHƯƠNG TRÌNH ---\n");
+
+        // --- a. Ghi dữ liệu bằng FileOutputStream ---
+        // Sử dụng try-with-resources để tự động đóng file (close)
+        try (FileOutputStream fos = new FileOutputStream(fileName)) {
+            
+            // FileOutputStream làm việc với byte, nên cần chuyển String sang byte[]
+            byte[] data = myName.getBytes();
+            
+            fos.write(data);
+            
+            System.out.println("1. Đã ghi chuỗi \"" + myName + "\" vào file " + fileName);
+
+        } catch (IOException e) {
+            System.err.println("Lỗi khi ghi file: " + e.getMessage());
+        }
+
+        // --- b. Đọc dữ liệu bằng FileInputStream và In hoa ---
+        System.out.print("2. Đọc file và chuyển thành in hoa: ");
+        
+        try (FileInputStream fis = new FileInputStream(fileName)) {
+            
+            int i;
+            // Đọc từng byte một (byte = -1 nghĩa là hết file)
+            while ((i = fis.read()) != -1) {
+                // Ép kiểu int sang char để lấy ký tự
+                char c = (char) i;
+                
+                // Chuyển ký tự thành in hoa và in ra màn hình
+                System.out.print(Character.toUpperCase(c));
+            }
+            System.out.println(); // Xuống dòng cho đẹp
+
+        } catch (IOException e) {
+            System.err.println("Lỗi khi đọc file: " + e.getMessage());
+        }
+        
+        System.out.println("\n--- KẾT THÚC ---");
+    }
+}
+
 
